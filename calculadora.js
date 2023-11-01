@@ -121,5 +121,4 @@ function limpiar(){
     resultado.textContent = res;
   }
 
-
-  //https://github.com/EfrenTC/Calculadora-JS/blob/main/calculadora.js
+//https://github.com/EfrenTC/Calculadora-JS/edit/main/calculadora.js
