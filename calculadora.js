@@ -1,124 +1,173 @@
-//Declaramos variables
-var operandoa;
-var operandob;
-var operacion;
+$(document).ready(function() {
+    var last = "";
+    var next = "";
+    var result = 0;
+    var history = [];
+    var reset = false;
+    var lastInput = "";
 
+    function type(n) {
+        if (n == "0" && $("#temp").text() == "0") 
+            return;
 
-function init(){
-    //variables
-    var resultado = document.getElementById('resultado');
-    var reset = document.getElementById('reset');
-    var suma = document.getElementById('suma');
-    var resta = document.getElementById('resta');
-    var multiplicacion = document.getElementById('multiplicacion');
-    var division = document.getElementById('division');
-    var igual = document.getElementById('igual');
-    var uno = document.getElementById('uno');
-    var dos = document.getElementById('dos');
-    var tres = document.getElementById('tres');
-    var cuatro = document.getElementById('cuatro');
-    var cinco = document.getElementById('cinco');
-    var seis = document.getElementById('seis');
-    var siete = document.getElementById('siete');
-    var ocho = document.getElementById('ocho');
-    var nueve = document.getElementById('nueve');
-    var cero = document.getElementById('cero');
-}
+        if (n == "." && $("#temp").text().indexOf(n) >= 0)
+            return;
 
+        if (($("#temp").text() == "0" || reset) && n != ".") {
+            lastInput = $("#temp").text();
+            $("#temp").text("");
+            reset = false;
+            last = next;
+            next = "";
+        }
 
-    //Eventos de click
-  uno.onclick = function(e){
-    resultado.textContent = resultado.textContent  + "1";
-}
-dos.onclick = function(e){
-    resultado.textContent = resultado.textContent  + "2";
-}
-tres.onclick = function(e){
-    resultado.textContent = resultado.textContent  + "3";
-}
-cuatro.onclick = function(e){
-    resultado.textContent = resultado.textContent  + "4";
-}
-cinco.onclick = function(e){
-    resultado.textContent = resultado.textContent  + "5";
-}
-seis.onclick = function(e){
-    resultado.textContent = resultado.textContent  + "6";
-}
-siete.onclick = function(e){
-    resultado.textContent = resultado.textContent  + "7";
-}
-ocho.onclick = function(e){
-    resultado.textContent = resultado.textContent  + "8";
-}
-nueve.onclick = function(e){
-    resultado.textContent = resultado.textContent  + "9";
-}
-cero.onclick = function(e){
-    resultado.textContent = resultado.textContent  + "0";
-}
-reset.onclick = function(e){
-    resetear();
-}
-suma.onclick = function(e){
-    operandoa = resultado.textContent;
-    operacion = "+";
-    limpiar();
-}
-resta.onclick = function(e){
-    operandoa = resultado.textContent;
-    operacion = "-";
-    limpiar();
-}
-multiplicacion.onclick = function(e){
-    operandoa = resultado.textContent;
-    operacion = "*";
-    limpiar();
-}
-division.onclick = function(e){
-    operandoa = resultado.textContent;
-    operacion = "/";
-    limpiar();
-}
-igual.onclick = function(e){
-    operandob = resultado.textContent;
-    resolver();
-}
-
-
-
-
-function limpiar(){
-    resultado.textContent = "";
-  }
-  function resetear(){
-    resultado.textContent = "";
-    operandoa = 0;
-    operandob = 0;
-    operacion = "";
-  }
-
-
-
-
-  function resolver(){
-    var res = 0;
-    switch(operacion){
-      case "+":
-        res = parseFloat(operandoa) + parseFloat(operandob);
-        break;
-      case "-":
-          res = parseFloat(operandoa) - parseFloat(operandob);
-          break;
-      case "*":
-        res = parseFloat(operandoa) * parseFloat(operandob);
-        break;
-      case "/":
-        res = parseFloat(operandoa) / parseFloat(operandob);
-        break;
+        $("#temp").text($("#temp").text() + n);
     }
-    resetear();
-    resultado.textContent = res;
-  }
+
+    function nextOperation(op) {
+        switch (op) {
+            case "percent":
+                $("#temp").text(percent($("#temp").text()));
+                next = "";
+                return;
+            case "sqroot":
+                $("#temp").text(sqroot($("#temp").text()));
+                next = "";
+                return;
+            case "square":
+                $("#temp").text(square($("#temp").text()));
+                next = "";
+                return;
+            case "inverse":
+                $("#temp").text(inverse($("#temp").text()));
+                next = "";
+                return;
+        }
+
+        if (!next && last) 
+            solve();
+
+        next = op;
+        reset = true;
+    }
+
+    function sum(a, b) {
+        return Number(a) + Number(b);
+    }
+
+    function subs(a, b) {
+        return Number(a) - Number(b);
+    }
+
+    function multiply(a, b) {
+        return Number(a) * Number(b);
+    }
+
+    function divide(a, b) {
+        return Number(a) / Number(b);
+    }
+
+    function percent() {
+        return;
+    }
+
+    function sqroot(a) {
+        return Math.sqrt(Number(a));
+    }
+
+    function square(a) {
+        return Math.pow(Number(a), 2);
+    }
+
+    function inverse(a) {
+        return 1 / Number(a);
+    }
+
+    function plusminus() {
+        $("#temp").text(-$("#temp").text());
+    }
+
+    function solve() {
+        var a;
+        var b = lastInput;
+        var operation;
+
+        a = $("#temp").text();
+
+        switch (last) {
+            case "sum":
+                operation = sum;
+                break;
+            case "subs":
+                operation = subs;
+                break;
+            case "multiply":
+                operation = multiply;   
+                break;
+            case "divide":
+                operation = divide;
+                break;
+            case "percent":
+                percent(a);
+                next = "";
+                return;
+            case "sqroot":
+                sqroot();
+                next = "";
+                return;
+            case "square":
+                square(a);
+                next = "";
+                return;
+            case "inverse":
+                inverse(a);
+                next = "";
+                return;
+        }
+
+        result = operation(a, b);
+        lastInput = $("#temp").text();
+        $("#temp").text(result);
+
+        next = "";
+        reset = true;
+    }
+
+    function clearScr() {
+        $("#temp").text("0");
+    }
+
+    function resetInput() {
+        $("#temp").text("0");
+        next = "";
+        last = "";
+        lastInput = "";
+    }
+
+    function backspace() {
+        var foo = $("#temp").text();
+        foo = foo.split("");
+        foo.pop();
+        foo = foo.join("");
+        foo = foo == "" ? "0" : foo;
+
+        $("#temp").text(foo);
+    }
+
+    $(".btn-num").click(function() {
+        type($(this).text());
+        next = "";
+    });
+
+    $(".btn-op").click(function() {
+        let op = this.id;
+        if (op == "solve") {
+            solve();
+            return;
+        }
+        nextOperation(op);
+    });
+});
+
 
 //https://github.com/EfrenTC/Calculadora-JS/edit/main/calculadora.js
